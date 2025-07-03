@@ -12,9 +12,10 @@
       <div class="detail-info">
         <span>作者: {{ news.author }}</span>
         <span>发布时间: {{ news.createTime }}</span>
-        <span v-if="news.status == 0" class="status-tag status-pending">待审核</span>
-        <span v-if="news.status == 1" class="status-tag status-published">已发布</span>
-        <span v-if="news.status == 2" class="status-tag status-rejected">已驳回</span>
+        <span v-if="news.status == 1" class="status-tag status-pending">待审核</span>
+        <span v-else-if="news.status == 2" class="status-tag status-published">已发布</span>
+        <span v-else-if="news.status == 3" class="status-tag status-rejected">已驳回</span>
+        <span v-else class="status-tag status-unknown">未知状态</span>
       </div>
       <el-image
         v-if="news.image"
@@ -24,7 +25,7 @@
       <div class="detail-content">
         {{ news.content }}
       </div>
-      <el-affix v-if="news.status == 0" position="bottom" :offset="40">
+      <el-affix v-if="news.status == 1 && userInfo.role == 'admin'" position="bottom" :offset="40">
         <div style="display: flex; justify-content: center">
           <el-button
             @click="drawerExam = true"
@@ -49,8 +50,8 @@
             "
           >
             <h2 style="margin: 0">审核结果：</h2>
-            <el-button type="success" plain>通过</el-button>
-            <el-button type="danger" plain>驳回</el-button>
+            <el-button @click="clickPass" type="success" plain>通过</el-button>
+            <el-button @click="clickReject" type="danger" plain>驳回</el-button>
             <el-button @click="drawerExam = false" type="primary" plain>取消</el-button>
           </div>
         </template>
@@ -71,6 +72,10 @@ const drawerExam = ref(false)
 
 const route = useRoute()
 const router = useRouter()
+const userInfo = ref({
+  username: '管理员',
+  role: 'admin', // admin 或 enterprise
+})
 const news = ref({
   id: null,
   title: '',
@@ -106,6 +111,16 @@ const fetchNewsDetail = async () => {
 const goBack = () => {
   router.back()
 }
+
+const clickPass = () => {
+  //上传……
+  router.back()
+}
+
+const clickReject = () => {
+  //上传……
+  router.back()
+}
 </script>
 
 <style scoped>
@@ -134,6 +149,10 @@ const goBack = () => {
 
 .status-tag.status-rejected {
   background-color: #f56c6c;
+}
+
+.status-tag.status-unknown {
+  background-color: #868484;
 }
 
 .detail-content {

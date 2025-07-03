@@ -15,6 +15,8 @@
           <el-upload
             class="upload-demo"
             action="#"
+            :multiple="false"
+            :limit="1"
             :on-preview="handlePreview"
             :on-remove="handleRemove"
             :before-upload="beforeUpload"
@@ -45,19 +47,6 @@
             placeholder="请输入新闻内容"
           />
         </el-form-item>
-        <el-form-item v-if="isApprove">
-          <el-radio-group v-model="approveStatus">
-            <el-radio :label="1">通过</el-radio>
-            <el-radio :label="2">驳回</el-radio>
-          </el-radio-group>
-          <el-input
-            v-model="rejectReason"
-            type="textarea"
-            :rows="2"
-            placeholder="请输入驳回原因(选填)"
-            v-if="approveStatus === 2"
-          />
-        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitForm">提交</el-button>
           <el-button @click="resetForm">重置</el-button>
@@ -68,20 +57,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, defineProps, defineEmits } from 'vue'
+import { ref, reactive, onMounted, defineEmits } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox, ElImage, ElUpload } from 'element-plus'
-
-const props = defineProps({
-  formType: {
-    type: String,
-    required: true, // add, edit, approve
-  },
-  newsId: {
-    type: Number,
-    default: null,
-  },
-})
 
 const emits = defineEmits(['submit', 'reset'])
 
@@ -89,6 +67,16 @@ const route = useRoute()
 const router = useRouter()
 const formRef = ref(null)
 const fileList = ref<{ url: string }[]>([])
+const tempForm = reactive({
+  id: null,
+  title: '',
+  author: '',
+  image: '',
+  summary: '',
+  content: '',
+  status: 0,
+  createTime: '',
+})
 const newsForm = reactive({
   id: null,
   title: '',
@@ -100,9 +88,6 @@ const newsForm = reactive({
   createTime: '',
 })
 const formTitle = ref('发布动态')
-const isApprove = ref(props.formType === 'approve')
-const approveStatus = ref(1)
-const rejectReason = ref('')
 const userInfo = ref({
   username: '管理员',
   role: 'admin', // admin 或 enterprise
@@ -114,15 +99,16 @@ onMounted(() => {
   if (user) {
     userInfo.value = JSON.parse(user)
   }
+  fetchNewsDetail()
 
   // 设置表单标题
-  if (props.formType === 'add') {
+  if (route.query.formType === 'add') {
     formTitle.value = '发布动态'
     newsForm.author = userInfo.value.username
-  } else if (props.formType === 'edit') {
+  } else if (route.query.formType === 'edit') {
     formTitle.value = '编辑动态'
     fetchNewsDetail()
-  } else if (props.formType === 'approve') {
+  } else if (route.query.formType === 'approve') {
     formTitle.value = '审核动态'
     fetchNewsDetail()
   }
@@ -135,18 +121,10 @@ const fetchNewsDetail = async () => {
     await new Promise((resolve) => setTimeout(resolve, 300))
 
     // 模拟数据
-    const mockData = {
-      id: props.newsId,
-      title: '行业新政策解读',
-      author: '政策研究部',
-      createTime: '2023-06-01 10:00',
-      status: 0,
-      content: '这是政策解读的详细内容...',
-      summary: '新政策将带来行业重大变革',
-      image: 'https://picsum.photos/200/100?random=1',
-    }
+    const mockData = route.query
 
     // 复制数据到表单
+    Object.assign(tempForm, mockData)
     Object.assign(newsForm, mockData)
 
     // 如果有图片，添加到文件列表
@@ -201,15 +179,8 @@ const submitForm = () => {
       // 准备提交的数据
       const formData = { ...newsForm }
 
-      if (isApprove.value) {
-        formData.status = approveStatus.value
-        if (approveStatus.value === 2 && rejectReason.value) {
-          formData.rejectReason = rejectReason.value
-        }
-      } else if (props.formType === 'add') {
-        formData.status = userInfo.value.role === 'admin' ? 1 : 0 // 管理员直接发布，企业用户需要审核
-        formData.createTime = new Date().toISOString().slice(0, 19).replace('T', ' ')
-      }
+      formData.status = userInfo.value.role === 'admin' ? 1 : 0 // 管理员直接发布，企业用户需要审核
+      formData.createTime = new Date().toISOString().slice(0, 19).replace('T', ' ')
 
       // 提交表单
       emits('submit', formData)
@@ -221,7 +192,9 @@ const submitForm = () => {
 }
 
 const resetForm = () => {
-  if (props.formType === 'add') {
+  Object.assign(newsForm, tempForm)
+
+  if (route.query.formType === 'add') {
     // 重置为初始值
     newsForm.title = ''
     newsForm.author = userInfo.value.username
