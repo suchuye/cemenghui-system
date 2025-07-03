@@ -6,9 +6,9 @@
         <div class="user-info">
           <span>{{ userInfo.username }}</span>
           <el-dropdown @command="handleCommand">
-            <span class="el-dropdown-link">
-              操作菜单 <i class="el-icon-arrow-down el-icon--right"></i>
-            </span>
+            <el-icon style="margin-right: 8px; margin-top: 1px; color: white" size="large">
+              <setting />
+            </el-icon>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="logout">退出登录</el-dropdown-item>
@@ -35,11 +35,14 @@
                   index="1-1"
                   v-if="userInfo.role === 'admin'"
                   @click="router.push('/list')"
-                  >全部动态</el-menu-item
                 >
-                <el-menu-item index="1-2">我的动态</el-menu-item>
-                <el-menu-item index="1-3" v-if="userInfo.role === 'admin'">待审核动态</el-menu-item>
-                <el-menu-item index="1-4">发布动态</el-menu-item>
+                  全部动态
+                </el-menu-item>
+                <el-menu-item index="1-2" @click="goToMyList">我的动态</el-menu-item>
+                <el-menu-item index="1-3" v-if="userInfo.role === 'admin'" @click="goToPendingList"
+                  >待审核动态</el-menu-item
+                >
+                <el-menu-item index="1-4" @click="router.push('/form')">发布动态</el-menu-item>
               </el-menu-item-group>
             </el-sub-menu>
           </el-menu>
@@ -52,9 +55,10 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { Setting } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const activeMenu = ref('1-2')
@@ -71,6 +75,14 @@ onMounted(() => {
     userInfo.value = JSON.parse(user)
   }
 })
+
+const goToMyList = () => {
+  router.push({ path: '/list', query: { listType: 'my' } })
+}
+
+const goToPendingList = () => {
+  router.push({ path: '/list', query: { listType: 'pending' } })
+}
 
 const handleOpen = (key, keyPath) => {
   console.log(key, keyPath)

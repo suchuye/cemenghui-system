@@ -67,7 +67,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, onMounted, defineProps, defineEmits } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox, ElImage, ElUpload } from 'element-plus'
@@ -88,7 +88,7 @@ const emits = defineEmits(['submit', 'reset'])
 const route = useRoute()
 const router = useRouter()
 const formRef = ref(null)
-const fileList = ref([])
+const fileList = ref<{ url: string }[]>([])
 const newsForm = reactive({
   id: null,
   title: '',
@@ -161,17 +161,19 @@ const fetchNewsDetail = async () => {
 }
 
 // 上传相关方法
-const handleRemove = (file, fileList) => {
+import type { UploadFile } from 'element-plus'
+
+const handleRemove = (file: UploadFile, fileList: UploadFile[]) => {
   console.log(file, fileList)
   newsForm.image = ''
 }
 
-const handlePreview = (file) => {
+const handlePreview = (file: UploadFile) => {
   console.log(file)
   // 预览图片逻辑
 }
 
-const beforeUpload = (file) => {
+const beforeUpload = (file: File) => {
   const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
   if (!isJPG) {
     ElMessage.error('上传图片只能是 JPG 或 PNG 格式!')
@@ -184,7 +186,7 @@ const beforeUpload = (file) => {
   // 模拟上传成功
   const reader = new FileReader()
   reader.onload = (e) => {
-    newsForm.image = e.target.result
+    newsForm.image = (e.target as FileReader).result as string
     fileList.value = [{ url: newsForm.image }]
   }
   reader.readAsDataURL(file)
