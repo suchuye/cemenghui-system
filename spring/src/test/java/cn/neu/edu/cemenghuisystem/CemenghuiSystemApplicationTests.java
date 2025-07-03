@@ -1,4 +1,4 @@
-package cn.neu.edu.cemenghuisystem;
+package java.cn.neu.edu.cemenghuisystem;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
