@@ -46,10 +46,9 @@ public class JWTFilter extends OncePerRequestFilter {
         // 如果 JWT 令牌不为空且当前请求未被认证
         if (jwtToken != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             int id= jwtUtil.extractId(jwtToken);
-            User user=userService.getUserById(id);
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
-                            user.getId(), null, null);
+                            id, null, null);
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             // 设置认证信息到安全上下文
