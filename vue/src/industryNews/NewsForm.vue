@@ -103,8 +103,8 @@ const newsForm = reactive({
 })
 const formTitle = ref('发布动态')
 const userInfo = ref({
-  username: '管理员',
-  role: 'admin',
+  username: '',
+  role: '',
 })
 
 // 模拟登录状态

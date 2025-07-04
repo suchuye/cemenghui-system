@@ -74,8 +74,8 @@ const drawerExam = ref(false)
 const route = useRoute()
 const router = useRouter()
 const userInfo = ref({
-  username: '管理员',
-  role: 'admin',
+  username: '',
+  role: '',
 })
 const news = ref({
   id: null,
