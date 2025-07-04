@@ -155,12 +155,10 @@ const getParams = () => {
 const fetchNewsList = async () => {
   try {
     // 这里获取数据
-    axios
-      .get('http://localhost:8000/news/find', { params: getParams() })
-      .then((res) => {
-        newsList.value = res.data.list
-        total.value = res.data.total
-      })
+    axios.get('http://localhost:8000/news/findPage', { params: getParams() }).then((res) => {
+      newsList.value = res.data.list
+      total.value = res.data.total
+    })
 
     // 模拟数据
     // const mockData = [
@@ -456,17 +454,19 @@ const handleSearch = () => {
 }
 
 const handleAdd = () => {
-  router.push('/news-form')
+  router.push({ path: '/news-form', query: { formType: 'add' } })
 }
 
 const handleView = (news: NewsItem) => {
-  //router.push({ path: '/news-detail', query: { id: news.id } })
-  router.push({ path: '/news-detail', query: news })
+  router.push({ path: '/news-detail', query: { id: news.id } })
+}
+
+const handleApprove = (news: NewsItem) => {
+  router.push({ path: '/news-detail', query: { id: news.id } })
 }
 
 const handleEdit = (news: NewsItem) => {
-  //router.push({ path: '/news-form', query: { id: news.id } })
-  router.push({ path: '/news-form', query: news })
+  router.push({ path: '/news-form', query: { formType: 'edit', id: news.id } })
 }
 
 const handleDelete = (news: NewsItem) => {
@@ -476,9 +476,7 @@ const handleDelete = (news: NewsItem) => {
     type: 'warning',
   })
     .then(() => {
-      // 模拟删除操作
       console.log('删除动态:', news.id)
-      // 实际项目中应该调用API删除
       const response = axios.get('http://localhost:8000/news/delete', {
         params: { id: news.id },
       })
@@ -497,10 +495,6 @@ const handleDelete = (news: NewsItem) => {
         message: '已取消删除',
       })
     })
-}
-
-const handleApprove = (news: NewsItem) => {
-  router.push({ path: '/news-detail', query: news })
 }
 </script>
 

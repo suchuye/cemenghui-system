@@ -66,6 +66,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import axios from 'axios'
 
 //抽屉：开关
 const drawerExam = ref(false)
@@ -93,14 +94,23 @@ onMounted(() => {
 // 获取新闻详情
 const fetchNewsDetail = async () => {
   try {
-    // 模拟API请求延迟
-    await new Promise((resolve) => setTimeout(resolve, 300))
+    // // 模拟API请求延迟
+    // await new Promise((resolve) => setTimeout(resolve, 300))
 
-    // 模拟数据
-    const mockData = route.query
+    // // 模拟数据
+    // const mockData = route.query
 
-    // 复制数据到详情
-    Object.assign(news.value, mockData)
+    // // 复制数据到详情
+    // Object.assign(news.value, mockData)
+    axios
+      .get('http://localhost:8000/news/findById', {
+        params: {
+          id: route.query.id,
+        },
+      })
+      .then((res) => {
+        news.value = res.data
+      })
   } catch (error) {
     console.error('获取新闻详情失败:', error)
     ElMessage.error('获取新闻详情失败')
@@ -112,13 +122,28 @@ const goBack = () => {
   router.back()
 }
 
+const updateNews = (num: number) => {
+  axios
+    .get('http://localhost:8000/news/update', {
+      params: { id: news.value.id, status: num },
+    })
+    .then(() => {
+      ElMessage({
+        type: 'success',
+        message: '审核成功',
+      })
+    })
+}
+
 const clickPass = () => {
   //上传……
+  updateNews(2)
   router.back()
 }
 
 const clickReject = () => {
   //上传……
+  updateNews(3)
   router.back()
 }
 </script>

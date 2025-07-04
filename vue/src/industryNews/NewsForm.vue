@@ -2,7 +2,12 @@
   <div class="news-form">
     <el-card>
       <template #header>
-        <div>{{ formTitle }}</div>
+        <div>
+          {{ formTitle }}
+          <el-button style="float: right; padding: 3px 0" type="text" @click="goBack">
+            返回列表
+          </el-button>
+        </div>
       </template>
       <el-form :model="newsForm" ref="formRef" label-width="120px" size="medium">
         <el-form-item label="标题" prop="title">
@@ -20,7 +25,7 @@
             :on-preview="handlePreview"
             :on-remove="handleRemove"
             :before-upload="beforeUpload"
-            :file-list="fileList"
+            :file-list="uploadFileList"
             list-type="picture-card"
           >
             <i class="el-icon-plus"></i>
@@ -57,16 +62,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, defineEmits } from 'vue'
+import { ref, reactive, onMounted, defineEmits, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox, ElImage, ElUpload } from 'element-plus'
+import { ElMessage, ElImage, ElUpload } from 'element-plus'
+import axios from 'axios'
+import type { UploadUserFile, FormInstance } from 'element-plus'
 
 const emits = defineEmits(['submit', 'reset'])
 
 const route = useRoute()
 const router = useRouter()
-const formRef = ref(null)
+const formRef = ref<FormInstance | null>(null)
 const fileList = ref<{ url: string }[]>([])
+const uploadFileList = computed<UploadUserFile[]>(() =>
+  fileList.value.map((file) => ({
+    url: file.url,
+    name: '', // 可选，UploadUserFile 需要 name 字段
+    status: 'success', // 可选，UploadUserFile 需要 status 字段
+  })),
+)
 const tempForm = reactive({
   id: null,
   title: '',
@@ -99,8 +113,6 @@ onMounted(() => {
   if (user) {
     userInfo.value = JSON.parse(user)
   }
-  fetchNewsDetail()
-
   // 设置表单标题
   if (route.query.formType === 'add') {
     formTitle.value = '发布动态'
@@ -117,20 +129,33 @@ onMounted(() => {
 // 获取新闻详情
 const fetchNewsDetail = async () => {
   try {
-    // 模拟API请求延迟
-    await new Promise((resolve) => setTimeout(resolve, 300))
+    // // 模拟API请求延迟
+    // await new Promise((resolve) => setTimeout(resolve, 300))
 
-    // 模拟数据
-    const mockData = route.query
+    // // 模拟数据
+    // const mockData = route.query
 
-    // 复制数据到表单
-    Object.assign(tempForm, mockData)
-    Object.assign(newsForm, mockData)
-
-    // 如果有图片，添加到文件列表
-    if (newsForm.image) {
-      fileList.value = [{ url: newsForm.image }]
-    }
+    // // 复制数据到表单
+    // Object.assign(tempForm, mockData)
+    axios
+      .get('http://localhost:8000/news/findById', {
+        params: {
+          id: route.query.id,
+        },
+      })
+      .then((res) => {
+        newsForm.id = res.data.id
+        newsForm.title = res.data.title
+        newsForm.author = res.data.author
+        newsForm.image = res.data.image
+        newsForm.summary = res.data.summary
+        newsForm.content = res.data.content
+        Object.assign(tempForm, newsForm)
+        // 如果有图片，添加到文件列表
+        if (newsForm.image) {
+          fileList.value = [{ url: newsForm.image }]
+        }
+      })
   } catch (error) {
     console.error('获取新闻详情失败:', error)
     ElMessage.error('获取新闻详情失败')
@@ -174,26 +199,63 @@ const beforeUpload = (file: File) => {
 
 // 表单操作
 const submitForm = () => {
-  formRef.value.validate((valid) => {
+  formRef.value?.validate((valid: boolean) => {
     if (valid) {
-      // 准备提交的数据
-      const formData = { ...newsForm }
-
-      formData.status = userInfo.value.role === 'admin' ? 1 : 0 // 管理员直接发布，企业用户需要审核
-      formData.createTime = new Date().toISOString().slice(0, 19).replace('T', ' ')
+      newsForm.status = userInfo.value.role === 'admin' ? 2 : 1 // 管理员直接发布，企业用户需要审核
+      newsForm.createTime = new Date().toISOString().slice(0, 19).replace('T', ' ')
 
       // 提交表单
-      emits('submit', formData)
+      if (route.query.formType === 'add') {
+        addNews()
+      } else if (route.query.formType === 'edit') {
+        updateNews()
+      }
     } else {
       console.log('error submit!!')
-      return false
     }
   })
 }
 
-const resetForm = () => {
-  Object.assign(newsForm, tempForm)
+const getParams = () => {
+  const params: any = { ...newsForm }
+  // 删除空值或空字符串的参数
+  Object.keys(params).forEach(
+    (key) =>
+      (params[key] === undefined || params[key] === null || params[key] === '') &&
+      delete params[key],
+  )
+  return params
+}
 
+const addNews = () => {
+  axios
+    .get('http://localhost:8000/news/add', {
+      params: getParams(),
+    })
+    .then(() => {
+      ElMessage({
+        type: 'success',
+        message: '添加成功',
+      })
+      router.back()
+    })
+}
+
+const updateNews = () => {
+  axios
+    .get('http://localhost:8000/news/update', {
+      params: getParams(),
+    })
+    .then(() => {
+      ElMessage({
+        type: 'success',
+        message: '修改成功',
+      })
+      router.back()
+    })
+}
+
+const resetForm = () => {
   if (route.query.formType === 'add') {
     // 重置为初始值
     newsForm.title = ''
@@ -204,9 +266,18 @@ const resetForm = () => {
     fileList.value = []
   } else {
     // 重新加载数据
-    fetchNewsDetail()
+    // fetchNewsDetail()
+    Object.assign(newsForm, tempForm)
+    // 如果有图片，添加到文件列表
+    if (newsForm.image) {
+      fileList.value = [{ url: newsForm.image }]
+    }
   }
   emits('reset')
+}
+
+const goBack = () => {
+  router.back()
 }
 </script>
 
