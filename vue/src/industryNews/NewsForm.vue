@@ -104,14 +104,20 @@ const newsForm = reactive({
 const formTitle = ref('发布动态')
 const userInfo = ref({
   username: '管理员',
-  role: 'admin', // admin 或 enterprise
+  role: 'admin',
 })
 
 // 模拟登录状态
 onMounted(() => {
+  // 在每个请求中附加JWT
+  const jwt = localStorage.getItem('jwt')
+  axios.defaults.headers.common['Authorization'] = 'Bearer ' + jwt
+
   const user = localStorage.getItem('userInfo')
   if (user) {
     userInfo.value = JSON.parse(user)
+  } else {
+    router.push('/logon')
   }
   // 设置表单标题
   if (route.query.formType === 'add') {
@@ -129,14 +135,6 @@ onMounted(() => {
 // 获取新闻详情
 const fetchNewsDetail = async () => {
   try {
-    // // 模拟API请求延迟
-    // await new Promise((resolve) => setTimeout(resolve, 300))
-
-    // // 模拟数据
-    // const mockData = route.query
-
-    // // 复制数据到表单
-    // Object.assign(tempForm, mockData)
     axios
       .get('http://localhost:8000/news/findById', {
         params: {
@@ -266,7 +264,6 @@ const resetForm = () => {
     fileList.value = []
   } else {
     // 重新加载数据
-    // fetchNewsDetail()
     Object.assign(newsForm, tempForm)
     // 如果有图片，添加到文件列表
     if (newsForm.image) {

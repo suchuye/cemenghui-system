@@ -75,7 +75,7 @@ const route = useRoute()
 const router = useRouter()
 const userInfo = ref({
   username: '管理员',
-  role: 'admin', // admin 或 enterprise
+  role: 'admin',
 })
 const news = ref({
   id: null,
@@ -88,20 +88,22 @@ const news = ref({
   image: '',
 })
 onMounted(() => {
+  // 在每个请求中附加JWT
+  const jwt = localStorage.getItem('jwt')
+  axios.defaults.headers.common['Authorization'] = 'Bearer ' + jwt
+
+  const user = localStorage.getItem('userInfo')
+  if (user) {
+    userInfo.value = JSON.parse(user)
+  } else {
+    router.push('/logon')
+  }
   fetchNewsDetail()
 })
 
 // 获取新闻详情
 const fetchNewsDetail = async () => {
   try {
-    // // 模拟API请求延迟
-    // await new Promise((resolve) => setTimeout(resolve, 300))
-
-    // // 模拟数据
-    // const mockData = route.query
-
-    // // 复制数据到详情
-    // Object.assign(news.value, mockData)
     axios
       .get('http://localhost:8000/news/findById', {
         params: {
