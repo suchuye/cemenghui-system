@@ -33,8 +33,8 @@
           />
           <el-select v-model="statusFilter" placeholder="状态筛选" style="width: 120px" @change="handleSearch">
             <el-option label="全部状态" value="" />
-            <el-option label="活跃用户" value="active" />
-            <el-option label="禁用用户" value="inactive" />
+            <el-option label="启用用户" :value="0" />
+            <el-option label="禁用用户" :value="1" />
           </el-select>
           <el-button type="primary" @click="handleSearch" icon="Search">搜索</el-button>
           <el-button @click="resetSearch" icon="Refresh">重置</el-button>
@@ -86,8 +86,8 @@
           </el-table-column>
           <el-table-column prop="status" label="状态" width="80" align="center">
             <template #default="scope">
-              <el-tag :type="scope.row.status === 'active' ? 'success' : 'danger'" size="small">
-                {{ scope.row.status === 'active' ? '活跃' : '禁用' }}
+              <el-tag :type="scope.row.status === 0 ? 'success' : 'danger'" size="small">
+                {{ scope.row.status === 0 ? '启用' : '禁用' }}
               </el-tag>
             </template>
           </el-table-column>
@@ -101,12 +101,12 @@
               </el-button>
               <el-button 
                 size="small" 
-                :type="scope.row.status === 'active' ? 'warning' : 'success'"
+                :type="scope.row.status === 0 ? 'warning' : 'success'"
                 @click="toggleUserStatus(scope.row)"
-                :icon="scope.row.status === 'active' ? 'Lock' : 'Unlock'"
+                :icon="scope.row.status === 0 ? 'Lock' : 'Unlock'"
                 :disabled="scope.row.userType === 'admin'"
               >
-                {{ scope.row.status === 'active' ? '禁用' : '启用' }}
+                {{ scope.row.status === 0 ? '禁用' : '启用' }}
               </el-button>
               <el-button size="small" type="danger" @click="deleteUser(scope.row)" icon="Delete" :disabled="scope.row.userType === 'admin'">
                 删除
@@ -178,8 +178,8 @@
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="userForm.status">
-            <el-radio label="active">活跃</el-radio>
-            <el-radio label="inactive">禁用</el-radio>
+            <el-radio :label="0">启用</el-radio>
+            <el-radio :label="1">禁用</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
@@ -253,7 +253,7 @@ const userForm = ref({
   phone: '',
   email: '',
   gender: 'secret',
-  status: 'active',
+  status: 0, // 默认启用
   remark: '',
   companyName: '',
   companyContact: ''
@@ -337,7 +337,7 @@ const showAddDialog = () => {
     phone: '',
     email: '',
     gender: 'secret',
-    status: 'active',
+    status: 0,
     remark: '',
     companyName: '',
     companyContact: ''
@@ -404,7 +404,7 @@ const deleteUserHandler = async (user) => {
 const toggleUserStatus = async (user) => {
   try {
     await ElMessageBox.confirm(
-      `确定要${user.status === 'active' ? '禁用' : '启用'}用户 "${user.nickname}" 吗？`,
+      `确定要${user.status === 0 ? '禁用' : '启用'}用户 "${user.nickname}" 吗？`,
       '确认操作',
       {
         confirmButtonText: '确定',
@@ -412,8 +412,8 @@ const toggleUserStatus = async (user) => {
         type: 'warning'
       }
     )
-    await updateUser({ ...user, status: user.status === 'active' ? 'inactive' : 'active' })
-    ElMessage.success(`用户${user.status === 'active' ? '禁用' : '启用'}成功`)
+    await updateUser({ ...user, status: user.status === 0 ? 1 : 0 })
+    ElMessage.success(`用户${user.status === 0 ? '禁用' : '启用'}成功`)
     fetchUsers()
   } catch {}
 }
