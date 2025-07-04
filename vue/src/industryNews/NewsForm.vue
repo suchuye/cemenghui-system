@@ -117,7 +117,7 @@ onMounted(() => {
   if (user) {
     userInfo.value = JSON.parse(user)
   } else {
-    router.push('/logon')
+    router.push('/login')
   }
   // 设置表单标题
   if (route.query.formType === 'add') {

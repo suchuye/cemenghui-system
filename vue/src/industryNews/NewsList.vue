@@ -124,7 +124,7 @@ onMounted(() => {
   if (user) {
     userInfo.value = JSON.parse(user)
   } else {
-    router.push('/logon')
+    router.push('/login')
   }
   fetchNewsList()
 })

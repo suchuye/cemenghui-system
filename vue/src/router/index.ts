@@ -3,7 +3,13 @@ import { createRouter, createWebHistory } from 'vue-router'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-
+    //1、用户管理子系统
+    {
+      //登录页面
+      path: '/login',
+      name: 'login',
+      component: () => import('../views/Login.vue'),
+    },
     //2、行业动态管理子系统
     {
         //动态详情页面
