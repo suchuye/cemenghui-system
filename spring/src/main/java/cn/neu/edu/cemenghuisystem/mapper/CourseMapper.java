@@ -1,6 +1,7 @@
 package cn.neu.edu.cemenghuisystem.mapper;
 
 import cn.neu.edu.cemenghuisystem.pojo.Course;
+import cn.neu.edu.cemenghuisystem.pojo.SQLCount;
 import cn.neu.edu.cemenghuisystem.sqlProvider.CourseCountSQLProvider;
 import cn.neu.edu.cemenghuisystem.sqlProvider.CourseSQLProvide;
 import org.apache.ibatis.annotations.*;
@@ -37,8 +38,7 @@ public interface CourseMapper {
     );
 
     @SelectProvider(type = CourseCountSQLProvider.class, method = "selectCoursesByPage")
-    @ResultMap("courseResultMap")
-    public List<Course> getNumByPage(
+    public int getNumByPage(
             @Param("sort") String sort,
             @Param("order") String order,
             @Param("name") String name,

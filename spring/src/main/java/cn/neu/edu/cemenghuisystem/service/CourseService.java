@@ -93,7 +93,7 @@ public class CourseService {
     public DataResponse searchCourse(int page, int pageSize, String sort, String order,String name,int sortOrder,String author) {
         try{
            List<Course> list=courseMapper.selectCoursesByPage(page,pageSize,sort,order,name,sortOrder,author,null);
-           int total=courseMapper.getNumByPage(sort,order,name,sortOrder,author,null).size();
+           int total=courseMapper.getNumByPage(sort,order,name,sortOrder,author,null);
             Pagination pagination=new Pagination(total,page,pageSize);
            InfoList infoList=new InfoList(pagination,list);
            return new DataResponse(200,"success",infoList);

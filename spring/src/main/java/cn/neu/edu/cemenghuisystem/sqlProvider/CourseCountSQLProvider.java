@@ -23,7 +23,7 @@ public class CourseCountSQLProvider {
             order = "desc"; // 默认排序方向
         }
 
-        StringBuilder sql = new StringBuilder("SELECT * FROM public.COURSE WHERE 1=1");
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM public.COURSE WHERE 1=1");
 
         // 动态添加查询条件
         String name = (String) params.get("name");
