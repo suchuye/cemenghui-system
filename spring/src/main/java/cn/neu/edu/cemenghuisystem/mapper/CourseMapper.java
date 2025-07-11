@@ -1,7 +1,6 @@
 package cn.neu.edu.cemenghuisystem.mapper;
 
 import cn.neu.edu.cemenghuisystem.pojo.Course;
-import cn.neu.edu.cemenghuisystem.pojo.SQLCount;
 import cn.neu.edu.cemenghuisystem.sqlProvider.CourseCountSQLProvider;
 import cn.neu.edu.cemenghuisystem.sqlProvider.CourseSQLProvide;
 import org.apache.ibatis.annotations.*;
