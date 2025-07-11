@@ -49,15 +49,14 @@ public class CourseController {
 
     @GetMapping("/search")
     @ResponseBody
-    public DataResponse searchCourse() {
-        //TODO
-          return courseService.searchCourse();
+    public DataResponse searchCourse(@RequestParam int page, @RequestParam int pageSize, @RequestParam(required = false,defaultValue ="sort" ) String sort, @RequestParam(required = false,defaultValue = "desc") String order ,@RequestParam(required = false,defaultValue ="null") String name,@RequestParam(required = false,defaultValue ="-1")int sortOrder,@RequestParam(required = false,defaultValue = "null")String author) {
+          return courseService.searchCourse(page,pageSize,sort,order,name,sortOrder,author);
     }
 
     @GetMapping("/pending")
     @ResponseBody
     public DataResponse getCoursePending(@RequestParam int page, @RequestParam int pageSize, @RequestParam(required = false,defaultValue ="sort" ) String sort, @RequestParam(required = false,defaultValue = "desc") String order) {
-        return null;
+        return courseService.getPendingCourseList(page, pageSize, sort, order);
     }
 
     @PutMapping("/audit")

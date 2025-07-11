@@ -13,14 +13,6 @@ public class CourseMapperTest {
     @Autowired
     private CourseMapper courseMapper;
 
-    @Test
-    public void getCourse() {
-        System.out.println(courseMapper.selectAllCoursesByPageOrderByTimeDesc(1,1));
-    }
-    @Test
-    public void getCourseAsc() {
-        System.out.println(courseMapper.selectAllCoursesByPageOrderByTimeASC(1,2));
-    }
 
     @Test
     public void insertCourse() {
@@ -45,7 +37,7 @@ courseMapper.insertCourse(course);
 
     @Test
     public void selectAllCoursesByPage() {
-        System.out.println(courseMapper.selectCoursesByPage(1,3,"created_time","desc"));
+
 
     }
 

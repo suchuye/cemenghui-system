@@ -1,6 +1,7 @@
 package cn.neu.edu.cemenghuisystem.mapper;
 
 import cn.neu.edu.cemenghuisystem.pojo.Course;
+import cn.neu.edu.cemenghuisystem.sqlProvider.CourseCountSQLProvider;
 import cn.neu.edu.cemenghuisystem.sqlProvider.CourseSQLProvide;
 import org.apache.ibatis.annotations.*;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -18,23 +19,7 @@ public interface CourseMapper {
             @Result(property = "createdTime",column = "create_time")
     })
 
-    @Select("select * from public.COURSE order by create_time DESC limit #{pageSize} offset #{start}")
-    public List<Course> selectAllCoursesByPageOrderByTimeDesc(int start, int pageSize);
-
-    @Select("select * from public.COURSE order by create_time ASC limit #{pageSize} offset #{start}")
-    @ResultMap("courseResultMap")
-    public  List<Course> selectAllCoursesByPageOrderByTimeASC(int start, int pageSize);
-
-    @Select("select * from public.COURSE order by sort_order DESC limit #{pageSize} offset #{start}")
-    @ResultMap("courseResultMap")
-    public  List<Course> selectAllCoursesByPageOrderBySortDESC(int start, int pageSize);
-
-    @Select("select * from public.COURSE order by sort_order ASC limit #{pageSize} offset #{start}")
-    @ResultMap("courseResultMap")
-    public  List<Course> selectAllCoursesByPageOrderBySortASC(int start, int pageSize);
-
     @Select("select * from public.COURSE where id=#{id}")
-    @ResultMap("courseResultMap")
     public Course selectById(int id);
 
 
@@ -47,8 +32,22 @@ public interface CourseMapper {
             @Param("order") String order,
             @Param("name") String name,
             @Param("sortOrder") Integer sortOrder,
-            @Param("author") String author
+            @Param("author") String author,
+            @Param("auditStatus") String auditStatus
     );
+
+    @SelectProvider(type = CourseCountSQLProvider.class, method = "selectCoursesByPage")
+    @ResultMap("courseResultMap")
+    public List<Course> getNumByPage(
+            @Param("sort") String sort,
+            @Param("order") String order,
+            @Param("name") String name,
+            @Param("sortOrder") Integer sortOrder,
+            @Param("author") String author,
+            @Param("auditStatus") String auditStatus
+    );
+
+
 
 
     @Insert("INSERT INTO public.COURSE (\n" +

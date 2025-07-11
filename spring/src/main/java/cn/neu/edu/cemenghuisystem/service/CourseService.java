@@ -1,9 +1,10 @@
 package cn.neu.edu.cemenghuisystem.service;
 
-import cn.neu.edu.cemenghuisystem.interfaces.CourseSelect;
 import cn.neu.edu.cemenghuisystem.mapper.CourseMapper;
 import cn.neu.edu.cemenghuisystem.pojo.Course;
 import cn.neu.edu.cemenghuisystem.pojo.DataResponse;
+import cn.neu.edu.cemenghuisystem.pojo.InfoList;
+import cn.neu.edu.cemenghuisystem.pojo.Pagination;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -23,24 +24,12 @@ public class CourseService {
     @Autowired
     private CourseMapper courseMapper;
 
-    private  final Map<String,CourseSelect> courseSelectMap;
-
-    public CourseService(CourseByTimeDESC courseByTimeDESC,CourseByTimeASC courseByTimeASC,CourseBySortDESC courseBySortDESC,CourseBySortASC courseBySortASC) {
-        this.courseSelectMap = new HashMap<>();
-        courseSelectMap.put("timedesc",courseByTimeDESC);
-        courseSelectMap.put("timeasc",courseByTimeASC);
-        courseSelectMap.put("sortdesc",courseBySortDESC);
-        courseSelectMap.put("sortasc",courseBySortASC);
-    }
 
     @Transactional(readOnly = true)
     public DataResponse getCourseListByAll(int page, int pageSize, String sort, String order) {
         try {
-            CourseSelect select = courseSelectMap.get(sort + order);
-            if (select == null) {
-                select = courseSelectMap.get("sortdesc");
-            }
-            List<Course> courseList = select.getCourseList(page, pageSize);
+
+            List<Course> courseList = courseMapper.selectCoursesByPage(page,pageSize,sort,order,null,null,null,null);
             if (courseList == null) {
                 return new DataResponse(404, "未找到课程", null);
             }
@@ -74,6 +63,7 @@ public class CourseService {
     public DataResponse updateCourse(int id,Course course) {
         try{
             Course course1=courseMapper.selectById(id);
+            course.setAuditStatus("待审核");
             if (course1 == null) {
                 return new DataResponse(0, "cannot find course",null);
             }
@@ -100,12 +90,27 @@ public class CourseService {
         }
     }
 
-    public DataResponse searchCourse(){
-        return null;
+    public DataResponse searchCourse(int page, int pageSize, String sort, String order,String name,int sortOrder,String author) {
+        try{
+           List<Course> list=courseMapper.selectCoursesByPage(page,pageSize,sort,order,name,sortOrder,author,null);
+           int total=courseMapper.getNumByPage(sort,order,name,sortOrder,author,null).size();
+            Pagination pagination=new Pagination(total,page,pageSize);
+           InfoList infoList=new InfoList(pagination,list);
+           return new DataResponse(200,"success",infoList);
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+            return new DataResponse(500, e.getMessage(), null);
+        }
     }
 
     public DataResponse getPendingCourseList(int page, int pageSize, String sort, String order) {
-return null;
+        try{
+            List<Course> list=courseMapper.selectCoursesByPage(page,pageSize,sort,order,null,null,null,"待审核");
+            return new DataResponse(200,"success",list);
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+            return new DataResponse(500, e.getMessage(), null);
+        }
     }
 
     public DataResponse auditCourse(int id,Course course) {
@@ -154,52 +159,5 @@ return null;
         if (source.getCreatedTime() != null) {
             target.setCreatedTime(source.getCreatedTime());
         }
-    }
-}
-
-@Service
-class CourseByTimeDESC implements CourseSelect {
-
-    @Autowired
-    public CourseMapper courseMapper;
-
-    @Override
-    public List<Course> getCourseList(int pageNo, int pageSize) {
-        return courseMapper.selectAllCoursesByPageOrderByTimeDesc((pageNo-1)*pageSize,pageSize);
-    }
-}
-
-@Service
-class CourseByTimeASC implements CourseSelect {
-
-    @Autowired
-    public CourseMapper courseMapper;
-
-    @Override
-    public List<Course> getCourseList(int pageNo, int pageSize) {
-        return courseMapper.selectAllCoursesByPageOrderByTimeASC((pageNo-1)*pageSize,pageSize);
-    }
-}
-
-@Service
-class CourseBySortDESC implements CourseSelect {
-
-    @Autowired
-    public CourseMapper courseMapper;
-
-    @Override
-    public List<Course> getCourseList(int pageNo, int pageSize) {
-        return courseMapper.selectAllCoursesByPageOrderBySortDESC((pageNo-1)*pageSize,pageSize);
-    }
-}
-@Service
-class CourseBySortASC implements CourseSelect {
-
-    @Autowired
-    public CourseMapper courseMapper;
-
-    @Override
-    public List<Course> getCourseList(int pageNo, int pageSize) {
-        return courseMapper.selectAllCoursesByPageOrderBySortASC((pageNo-1)*pageSize,pageSize);
     }
 }

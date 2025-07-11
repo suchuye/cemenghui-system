@@ -2,12 +2,8 @@ package cn.neu.edu.cemenghuisystem.sqlProvider;
 
 import java.util.Map;
 
-public class CourseSQLProvide {
+public class CourseCountSQLProvider {
     public String selectCoursesByPage(Map<String, Object> params) {
-        Integer page = (Integer) params.get("page");
-        Integer pageSize = (Integer) params.get("pageSize");
-        int start = (page != null && page > 0 ? page - 1 : 0) * (pageSize != null && pageSize > 0 ? pageSize : 10);
-        pageSize = pageSize != null && pageSize > 0 ? pageSize : 10;
 
         // 处理排序参数
         String sort = (String) params.get("sort");
@@ -52,8 +48,6 @@ public class CourseSQLProvide {
         }
 
         // 添加排序和分页
-        sql.append(" ORDER BY ").append(sortField).append(" ").append(order.toUpperCase());
-        sql.append(" LIMIT ").append(pageSize).append(" OFFSET ").append(start);
         System.out.println(sql.toString());
         return sql.toString();
     }
