@@ -22,4 +22,9 @@ public class UserMapperTest {
     public void selectUserById() {
         System.out.println(userMapper.getUserById(5));
     }
+
+    @Test
+    public void getByUsername() {
+        System.out.println(userMapper.getUserByUserName("su"));
+    }
 }

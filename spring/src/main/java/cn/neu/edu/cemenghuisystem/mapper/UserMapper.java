@@ -22,4 +22,10 @@ public interface UserMapper {
             @Result(property = "userName",column = "user_name")
     })
     User getUserById(Integer id);
+
+    @Select("SELECT * FROM public.USER WHERE user_name=#{userName}")
+    @Results({
+            @Result(property = "userName",column = "user_name")
+    })
+    User getUserByUserName(String userName);
 }

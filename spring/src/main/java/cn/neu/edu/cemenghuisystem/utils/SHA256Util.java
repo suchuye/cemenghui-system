@@ -1,19 +1,27 @@
 package cn.neu.edu.cemenghuisystem.utils;
 
+import org.springframework.stereotype.Component;
+
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+
 public class SHA256Util {
+    private static final String FIXED_KEY = "0123456789ABCDEF0123456789ABCDEF";
     private static final String ALGORITHM = "AES";
     private SecretKey secretKey;
 
     public SHA256Util() throws Exception {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance(ALGORITHM);
-        keyGenerator.init(256);
-        this.secretKey = keyGenerator.generateKey();
+        try {
+            byte[] keyBytes = FIXED_KEY.getBytes(StandardCharsets.UTF_8);
+            this.secretKey = new SecretKeySpec(keyBytes, ALGORITHM);
+        } catch (Exception e) {
+            throw new RuntimeException("密钥初始化失败", e);
+        }
     }
 
     public SHA256Util(String key) throws Exception {
@@ -46,7 +54,7 @@ public class SHA256Util {
             String secretKeyString = encryptor.getKeyAsString();
             System.out.println("生成的密钥: " + secretKeyString);
 
-            String originalString = "Hello, World!";
+            String originalString = "111";
             String encryptedString = encryptor.encrypt(originalString);
             System.out.println("加密后的字符串: " + encryptedString);
 
