@@ -43,6 +43,12 @@ courseMapper.insertCourse(course);
         System.out.println(courseMapper.selectById(2));
     }
 
+    @Test
+    public void selectAllCoursesByPage() {
+        System.out.println(courseMapper.selectCoursesByPage(1,3,"created_time","desc"));
+
+    }
+
     private Course createCourse() {
         Course course = new Course();
         course.setId(1);

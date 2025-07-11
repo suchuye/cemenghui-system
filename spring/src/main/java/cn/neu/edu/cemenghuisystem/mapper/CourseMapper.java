@@ -1,6 +1,7 @@
 package cn.neu.edu.cemenghuisystem.mapper;
 
 import cn.neu.edu.cemenghuisystem.pojo.Course;
+import cn.neu.edu.cemenghuisystem.sqlProvider.CourseSQLProvide;
 import org.apache.ibatis.annotations.*;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -35,6 +36,20 @@ public interface CourseMapper {
     @Select("select * from public.COURSE where id=#{id}")
     @ResultMap("courseResultMap")
     public Course selectById(int id);
+
+
+    @SelectProvider(type = CourseSQLProvide.class, method = "selectCoursesByPage")
+    @ResultMap("courseResultMap")
+    public List<Course> selectCoursesByPage(
+            @Param("page") Integer page,
+            @Param("pageSize") Integer pageSize,
+            @Param("sort") String sort,
+            @Param("order") String order,
+            @Param("name") String name,
+            @Param("sortOrder") Integer sortOrder,
+            @Param("author") String author
+    );
+
 
     @Insert("INSERT INTO public.COURSE (\n" +
             "        name, \n" +

@@ -105,7 +105,7 @@ public class CourseService {
     }
 
     public DataResponse getPendingCourseList(int page, int pageSize, String sort, String order) {
-
+return null;
     }
 
     public DataResponse auditCourse(int id,Course course) {
