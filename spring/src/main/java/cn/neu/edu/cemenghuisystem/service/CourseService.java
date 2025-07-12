@@ -29,11 +29,14 @@ public class CourseService {
     public DataResponse getCourseListByAll(int page, int pageSize, String sort, String order) {
         try {
 
-            List<Course> courseList = courseMapper.selectCoursesByPage(page,pageSize,sort,order,null,null,null,null);
-            if (courseList == null) {
+            List<Course> list = courseMapper.selectCoursesByPage(page,pageSize,sort,order,null,null,null,null);
+            int total=courseMapper.getNumByPage(null,null,null,null,null,null);
+            Pagination pagination=new Pagination(total,page,pageSize);
+            InfoList infoList=new InfoList(pagination,list);
+            if (list == null) {
                 return new DataResponse(404, "未找到课程", null);
             }
-            return new DataResponse(200, "success", courseList);
+            return new DataResponse(200, "success", infoList);
         }catch (Exception e){
             log.error(e.getMessage(),e);
             return new DataResponse(500, e.getMessage(), null);
@@ -69,7 +72,7 @@ public class CourseService {
             }
             else {
                 copyCourse(course,course1);
-                courseMapper.updateCourse(course);
+                courseMapper.updateCourse(course1);
                 return new DataResponse(200,"success",course);
             }
         }
@@ -106,7 +109,10 @@ public class CourseService {
     public DataResponse getPendingCourseList(int page, int pageSize, String sort, String order) {
         try{
             List<Course> list=courseMapper.selectCoursesByPage(page,pageSize,sort,order,null,null,null,"待审核");
-            return new DataResponse(200,"success",list);
+            int total=courseMapper.getNumByPage(sort,order,null,null,null,null);
+            Pagination pagination=new Pagination(total,page,pageSize);
+            InfoList infoList=new InfoList(pagination,list);
+            return new DataResponse(200,"success",infoList);
         }catch (Exception e){
             log.error(e.getMessage(),e);
             return new DataResponse(500, e.getMessage(), null);
@@ -121,7 +127,7 @@ public class CourseService {
             }
             else {
                 copyCourse(course,course1);
-                courseMapper.updateCourse(course);
+                courseMapper.updateCourse(course1);
                 return new DataResponse(200,"审核操作成功",course);
             }
         }

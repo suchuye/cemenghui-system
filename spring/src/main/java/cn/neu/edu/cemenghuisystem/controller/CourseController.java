@@ -29,7 +29,7 @@ public class CourseController {
     }
 
 
-    @PutMapping("/add")
+    @PostMapping("/add")
     @ResponseBody
     public DataResponse addCourse(@RequestBody Course course) {
      return courseService.addCourse(course);
@@ -53,7 +53,7 @@ public class CourseController {
           return courseService.searchCourse(page,pageSize,sort,order,name,sortOrder,author);
     }
 
-    @GetMapping("/pending")
+    @GetMapping("/pending/list")
     @ResponseBody
     public DataResponse getCoursePending(@RequestParam int page, @RequestParam int pageSize, @RequestParam(required = false,defaultValue ="sort" ) String sort, @RequestParam(required = false,defaultValue = "desc") String order) {
         return courseService.getPendingCourseList(page, pageSize, sort, order);

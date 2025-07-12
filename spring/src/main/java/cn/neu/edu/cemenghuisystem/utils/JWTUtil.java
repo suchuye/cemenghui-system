@@ -1,6 +1,6 @@
 package cn.neu.edu.cemenghuisystem.utils;
 
-import cn.neu.edu.cemenghuisystem.pojo.User;
+import cn.neu.edu.cemenghuisystem.pojo.LoginUserInfo;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -25,13 +25,13 @@ public class JWTUtil {
     @Value("${jwt.expiration}")
     private Long expiration;
 
-    public String generateAccessToken(User user) {
+    public String generateAccessToken(LoginUserInfo loginUserInfo) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("id", user.getId());
-        claims.put("userName",user.getUserName());
+        claims.put("id", loginUserInfo.getId());
+        claims.put("userName",loginUserInfo.getNickname());
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(user.getId().toString())
+                .setSubject(loginUserInfo.getId().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
                 .signWith(SignatureAlgorithm.HS256, secret)

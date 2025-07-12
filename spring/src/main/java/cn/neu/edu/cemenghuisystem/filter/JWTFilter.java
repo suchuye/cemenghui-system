@@ -1,7 +1,6 @@
 package cn.neu.edu.cemenghuisystem.filter;
 
-import cn.neu.edu.cemenghuisystem.pojo.User;
-import cn.neu.edu.cemenghuisystem.service.UserService;
+
 import cn.neu.edu.cemenghuisystem.utils.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,8 +24,6 @@ public class JWTFilter extends OncePerRequestFilter {
     @Autowired
     private JWTUtil jwtUtil;
 
-    @Autowired
-    private UserService userService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)

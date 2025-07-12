@@ -7,7 +7,7 @@ public class LoginResponse {
     private int code;
     private String msg;
     private String token;
-    private User user;
+    private LoginUserInfo userInfo;
 
     public LoginResponse(int code, String msg, String token) {
         this.code = code;
@@ -15,10 +15,10 @@ public class LoginResponse {
         this.token = token;
     }
 
-    public LoginResponse(int code, String msg, String token, User user) {
+    public LoginResponse(int code, String msg, String token, LoginUserInfo userInfo) {
         this.code = code;
         this.msg = msg;
         this.token = token;
-        this.user = user;
+        this.userInfo = userInfo;
     }
 }
