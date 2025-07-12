@@ -46,7 +46,7 @@ const recentUsers = ref([])
 onMounted(async () => {
   const res = await getUserList({ page: 1, pageSize: 5 })
   stats.value.totalUsers = res.total
-  stats.value.activeUsers = res.userList.filter(u => u.status === 'active').length
+  stats.value.activeUsers = res.userList.filter(u => u.status === 0).length
   stats.value.newUsers = res.userList.length // 可根据后端实际返回调整
   recentUsers.value = res.userList.slice(0, 5)
 })

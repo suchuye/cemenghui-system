@@ -61,7 +61,7 @@ export function changePassword(data: { oldPassword: string; newPassword: string 
  * @param {string} [params.companyName] - 企业名称
  * @param {string} [params.nickname] - 昵称
  * @param {string} [params.phone] - 手机号
- * @param {string} [params.status] - 状态
+ * @param {number} [params.status] - 状态（0=启用，1=禁用）
  * @param {number} [params.page] - 页码
  * @param {number} [params.pageSize] - 每页数量
  * @returns {Promise<Object>} 用户列表和总数
@@ -82,7 +82,7 @@ export async function getUserList(params) {
  * @param {string} [data.phone] - 手机号
  * @param {string} [data.email] - 邮箱
  * @param {string} [data.gender] - 性别
- * @param {string} [data.status] - 状态
+ * @param {number} [data.status] - 状态（0=启用，1=禁用）
  * @param {string} [data.remark] - 备注
  */
 export function createUser(data) {
@@ -99,7 +99,7 @@ export function createUser(data) {
  * @param {string} [data.gender] - 性别
  * @param {string} [data.companyName] - 企业名称
  * @param {string} [data.companyContact] - 企业联系方式
- * @param {string} [data.status] - 状态
+ * @param {number} [data.status] - 状态（0=启用，1=禁用）
  * @param {string} [data.remark] - 备注
  */
 export function updateUser(data) {

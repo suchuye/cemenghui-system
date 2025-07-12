@@ -6,7 +6,7 @@ export interface User {
   companyName: string;
   companyContact: string;
   roleId?: number;
-  status?: 'active' | 'inactive';
+  status?: number; // 状态，0=启用，1=禁用
   userType?: 'user' | 'admin';
   createdAt?: string;
 }
@@ -49,7 +49,7 @@ export interface LoginUserInfo {
   userType?: 'user' | 'admin'; // 用户类型，User
   companyName?: string; // 企业名称，User
   companyContact?: string; // 企业联系方式，User
-  status?: 'active' | 'inactive'; // 状态，User
+  status?: number; // 状态，0=启用，1=禁用
   phone?: string; // 手机号，UserProfile
   email?: string; // 邮箱，UserProfile
   gender?: 'male' | 'female' | 'secret'; // 性别，UserProfile

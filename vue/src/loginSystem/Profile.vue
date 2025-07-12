@@ -99,8 +99,8 @@
             </div>
             <div class="info-item">
               <span class="label">账户状态：</span>
-              <el-tag :type="userInfo.status === 'active' ? 'success' : 'danger'" size="small">
-                {{ userInfo.status === 'active' ? '活跃' : '禁用' }}
+              <el-tag :type="userInfo.status === 0 ? 'success' : 'danger'" size="small">
+                {{ userInfo.status === 0 ? '启用' : '禁用' }}
               </el-tag>
             </div>
             <div class="info-item">
